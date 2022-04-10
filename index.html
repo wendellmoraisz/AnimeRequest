@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animes</title>
+    <style>
+        body {
+            background-image: url('/assets/img/naruto.webp');
+            background-position: center;
+            object-fit: cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            font-size: 1.3em;
+        }
+        
+        div {
+            max-height: 80vh;
+            overflow-y: scroll;
+        }
+
+        table td {
+            border-bottom: solid 2px;
+        }
+
+        th {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Animes</h1>
+    <div>
+        <table>
+            <th>Nome</th>
+            <th>Estúdio</th>
+        </table>
+    </div>
+</body>
+
+<script>
+    function ajax(config) {
+        const xhr = new XMLHttpRequest()
+        xhr.open("GET", config.url, true)
+
+        xhr.onload = e => {
+            if (xhr.status === 200) {
+                config.sucess(xhr.response)
+            } else if (xhr.status >= 400) {
+                config.error({
+                    code: xhr.status,
+                    text: xhr.statusText
+                })
+            }
+        }
+
+        xhr.send()
+    }
+
+    ajax({
+        url:"data/animes.json",
+        method: "GET",
+        sucess(resp) {
+            const animes = JSON.parse(resp)
+
+            const rows = animes.map(anime => {
+                const tdTitle = document.createElement('td')
+                tdTitle.innerHTML = anime.title.text
+
+                const tdStudio = document.createElement('td')
+                tdStudio.innerHTML = anime.studio
+
+                const tr = document.createElement('tr')
+
+                tr.appendChild(tdTitle)
+                tr.appendChild(tdStudio)
+                return tr
+            })
+
+            const table = document.querySelector('table')
+            rows.forEach(row => table.appendChild(row))
+            const div = document.querySelector('div')
+            div.appendChild(table)
+        },
+        error(e) {
+            const msg = document.createElement(`${e.code}: ${e.text}`)
+            document.body.appendChild(msg)
+        }
+    })
+</script>
+</html>
